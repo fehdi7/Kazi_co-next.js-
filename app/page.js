@@ -66,8 +66,3 @@ export default function Home() {
     </main>
   )
 }
-
-export default async function Projects() {
-  const posts = await prisma.post.findMany();  // Test query
-  return <div>{posts.length} posts found</div>;
-}
