@@ -1,8 +1,9 @@
 import prisma from "@/src/lib/prisma";
 
 export default async function Postpage({ params }) {
+
   // Await params to access slug (required in Next.js 13+ App Router)
-    const slug =decodeURIComponent(params.slug); // 🔥 THIS LINE
+    const { slug } = await params; 
   try {
     const post = await prisma.post.findUnique({
       where: { slug: slug },  // Now slug is properly awaited and defined
