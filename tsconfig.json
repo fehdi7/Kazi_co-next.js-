@@ -27,6 +27,6 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "app/our_projects/[slug]/page.jsx"  ],
   "exclude": ["node_modules"]
 }
