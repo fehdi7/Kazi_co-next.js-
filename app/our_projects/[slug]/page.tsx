@@ -1,4 +1,5 @@
 import prisma from "@/src/lib/prisma";
+import Image from "next/image";
 
 export default async function Postpage({ params }) {
 

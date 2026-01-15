@@ -1,7 +1,7 @@
-import React from 'react'
 import Link from "next/link";
 import prisma from '@/src/lib/prisma'
 import { createPost } from '@src/actions/action'
+import { CldUploadWidget } from 'next-cloudinary';
 
 async function Projects() {
   const posts = await prisma.post.findMany()
@@ -19,6 +19,16 @@ async function Projects() {
         <input type='text' name='title' placeholder='Title' className='border border-amber-900 rounded-lg p-2'/>
         <textarea name='content' placeholder='Content' className='border border-amber-900 rounded-lg p-2'/>
         <button type='submit' className='bg-amber-900 text-white rounded-lg p-2'>Create Post</button>
+ 
+        <CldUploadWidget signatureEndpoint="<API Endpoint (ex: /api/sign-cloudinary-params)>">
+  {({ open }) => {
+    return (
+      <button onClick={() => open()}>
+        Upload an Image
+      </button>
+    );
+  }}
+        </CldUploadWidget>
       </form>
 
     </main>

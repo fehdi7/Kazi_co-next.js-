@@ -11,9 +11,17 @@ model post {
   title     String
   slug      String   @unique
   content   String
+  images    image[]
   published Boolean? @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index(slug)
+}
+
+model image {
+  id     String @id @default(uuid())
+  url    String
+  postId Int
+  post   post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
