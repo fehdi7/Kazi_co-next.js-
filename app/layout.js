@@ -9,6 +9,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL('https://www.kaziconstructions.com'),
   title: {
     default: "Kazi Constructions | Interior Design & Construction Company Mumbai",
     template: "%s | Kazi Constructions",
