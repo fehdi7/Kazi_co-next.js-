@@ -25,28 +25,35 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   const projects = await prisma.project.findMany({
     where: { categoryId: category.id },
+    include: { images: true },
     orderBy: { createdAt: 'desc' },
   });
 
-  const projectsWithCloudinary = await Promise.all(
+  const projectsWithPreview = await Promise.all(
     projects.map(async (project) => {
+      let previewImage = null;
+      
+      // First try to get image from Cloudinary
       try {
         const cloudinaryImages = await getImagesByFolder(`projects/${categorySlug}/${project.slug}`);
-        return {
-          id: project.id,
-          title: project.title,
-          slug: project.slug,
-          previewImage: cloudinaryImages[0]?.secure_url || null,
-        };
+        if (cloudinaryImages.length > 0) {
+          previewImage = cloudinaryImages[0].secure_url;
+        }
       } catch (error) {
         console.error(`Error fetching Cloudinary images for ${project.slug}:`, error);
-        return {
-          id: project.id,
-          title: project.title,
-          slug: project.slug,
-          previewImage: null,
-        };
       }
+      
+      // Fallback to database images if Cloudinary has no images
+      if (!previewImage && project.images.length > 0) {
+        previewImage = project.images[0].url;
+      }
+      
+      return {
+        id: project.id,
+        title: project.title,
+        slug: project.slug,
+        previewImage: previewImage,
+      };
     })
   );
 
@@ -69,13 +76,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
       {/* Projects Grid */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        {projectsWithCloudinary.length === 0 ? (
+        {projectsWithPreview.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-stone-500 text-lg">No projects yet in this category.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {projectsWithCloudinary.map((project) => (
+            {projectsWithPreview.map((project) => (
               <SiteCard
                 key={project.id}
                 category={category.slug}
