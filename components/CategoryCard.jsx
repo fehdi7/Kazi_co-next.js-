@@ -4,7 +4,7 @@ export default function CategoryCard({ name, slug, previewImage }) {
   return (
     <Link
       href={`/our_projects/${slug}`}
-      className="group relative overflow-hidden rounded-2xl bg-stone-800 h-48 flex items-center justify-center"
+      className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-stone-800 h-40 sm:h-48 flex items-center justify-center"
     >
       {previewImage ? (
         <>
@@ -19,9 +19,9 @@ export default function CategoryCard({ name, slug, previewImage }) {
         <div className="absolute inset-0 bg-linear-to-br from-stone-700 to-stone-800" />
       )}
       
-      <div className="relative z-10 text-center p-6">
-        <span className="text-3xl font-bold text-white drop-shadow-lg">{name}</span>
-        <div className="mt-2 text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="relative z-10 text-center p-4 sm:p-6">
+        <span className="text-xl sm:text-3xl font-bold text-white drop-shadow-lg">{name}</span>
+        <div className="mt-1 sm:mt-2 text-white/80 text-xs sm:text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           View Projects →
         </div>
       </div>

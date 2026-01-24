@@ -1,4 +1,4 @@
-import SiteCard from "@/components/SiteCard";
+import SiteCard from "@/components/SiteCard.jsx";
 import prisma from "@/src/lib/prisma";
 import { getImagesByFolder } from "@/src/lib/cloudinary";
 import Link from "next/link";
@@ -13,7 +13,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   if (!category) {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center px-4">
           <h1 className="text-2xl font-bold text-stone-800 mb-4">Category not found</h1>
           <Link href="/our_projects" className="text-amber-900 hover:underline">
             ← Back to all categories
@@ -53,28 +53,28 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <div className="bg-linear-to-r from-amber-900 via-amber-800 to-stone-800 py-12">
+      <div className="bg-linear-to-r from-amber-900 via-amber-800 to-stone-800 py-10 sm:py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/our_projects"
-            className="text-amber-200 hover:text-white mb-4 inline-flex items-center gap-2 transition-colors"
+            className="text-amber-200 hover:text-white mb-4 inline-flex items-center gap-2 transition-colors text-sm sm:text-base"
           >
             ← All Categories
           </Link>
-          <h1 className="text-3xl md:text-4xl font-bold text-white capitalize">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white capitalize">
             {category.name} Projects
           </h1>
         </div>
       </div>
 
       {/* Projects Grid */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {projectsWithCloudinary.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-stone-500 text-lg">No projects yet in this category.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {projectsWithCloudinary.map((project) => (
               <SiteCard
                 key={project.id}
