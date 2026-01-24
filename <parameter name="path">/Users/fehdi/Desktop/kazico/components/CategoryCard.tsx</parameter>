@@ -1,0 +1,38 @@
+import Link from "next/link";
+
+type Props = {
+  name: string;
+  slug: string;
+  previewImage?: string | null;
+};
+
+export default function CategoryCard({ name, slug, previewImage }: Props) {
+  return (
+    <Link
+      href={`/our_projects/${slug}`}
+      className="group relative overflow-hidden rounded-2xl bg-stone-800 h-48 flex items-center justify-center"
+    >
+      {previewImage ? (
+        <>
+          <img
+            src={previewImage}
+            alt={name}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          />
+          <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors" />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-linear-to-br from-stone-700 to-stone-800" />
+      )}
+
+      <div className="relative z-10 text-center p-6">
+        <span className="text-3xl font-bold text-white drop-shadow-lg">
+          {name}
+        </span>
+        <div className="mt-2 text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          View Projects
+        </div>
+      </div>
+    </Link>
+  );
+}

@@ -1,24 +1,34 @@
 import { NextResponse } from "next/server";
-import cloudinary from "@/src/lib/cloudinary";
+import  prisma  from "@/src/lib/prisma";
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { folder } = body;
+  try {
+    const { title, slug, categorySlug, images } = await req.json();
 
-  const timestamp = Math.round(Date.now() / 1000);
+    const category = await prisma.category.findUnique({
+      where: { slug: categorySlug },
+    });
 
-  const signature = cloudinary.utils.api_sign_request(
-    {
-      timestamp,
-      folder, // 👈 must be signed
-    },
-    process.env.CLOUDINARY_API_SECRET!
-  );
+    if (!category) {
+      return NextResponse.json({ error: "Category not found" }, { status: 400 });
+    }
 
-  return NextResponse.json({
-    timestamp,
-    signature,
-    apiKey: process.env.CLOUDINARY_API_KEY,
-    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  });
+    const project = await prisma.project.create({
+      data: {
+        title,
+        slug,
+        categoryId: category.id,
+        images: {
+          create: images.map((img: any) => ({
+            url: img.url,
+            publicId: img.publicId,
+          })),
+        },
+      },
+    });
+
+    return NextResponse.json(project);
+  } catch (err) {
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  }
 }

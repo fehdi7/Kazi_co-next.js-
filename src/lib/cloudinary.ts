@@ -6,4 +6,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
 
-export default cloudinary;
+export async function getImagesByFolder(folder: string) {
+  const res = await cloudinary.search
+    .expression(`folder:${folder}`)
+    .sort_by("created_at", "desc")
+    .max_results(50)
+    .execute();
+
+  return res.resources;
+}
