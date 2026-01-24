@@ -16,8 +16,11 @@ export default function SiteCard({ category, siteName, previewImage }) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-stone-200 flex items-center justify-center">
-            <span className="text-stone-400">No image</span>
+          <div className="absolute inset-0 bg-linear-to-br from-stone-700 to-stone-800 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl mb-2">🏗️</div>
+              <span className="text-white/60 text-xs">Preview coming soon</span>
+            </div>
           </div>
         )}
       </div>
