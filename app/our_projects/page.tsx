@@ -1,5 +1,7 @@
 import ProjectsClient from "./ProjectsClient";
-import prisma from "@/src/lib/prisma";
+import { getAllCategories } from "@/src/lib/cloudinary-data";
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: "Our Projects | Kazi Constructions - Interior Design Portfolio",
@@ -8,21 +10,13 @@ export const metadata = {
 };
 
 export default async function ProjectsPage() {
-  const categories = await prisma.category.findMany({
-    include: {
-      projects: {
-        include: { images: true },
-        take: 1,
-        orderBy: { createdAt: 'desc' }
-      },
-    },
-  });
+  const categories = await getAllCategories();
 
   const categoriesWithPreview = categories.map(cat => ({
     id: cat.id,
     name: cat.name,
     slug: cat.slug,
-    previewImage: cat.projects[0]?.images[0]?.url || null,
+    previewImage: cat.previewImage || null,
   }));
 
   return <ProjectsClient categories={categoriesWithPreview} />;

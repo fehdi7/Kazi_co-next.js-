@@ -1,39 +1,59 @@
 import CategoryClient from "./CategoryClient";
-import prisma from "@/src/lib/prisma";
-import { getImagesByFolder } from "@/src/lib/cloudinary";
+import { categoryExists, getProjectsByCategory, getAllCategories } from "@/src/lib/cloudinary-data";
+
+export const dynamic = 'force-dynamic';
+
+// Mapping of folder names to display names
+const CATEGORY_NAMES: Record<string, string> = {
+  COMMERICAL: "Commercial",
+  HEALTHCARE: "Healthcare",
+  HOSPITALITY: "Hospitality",
+  RESIDENTIAL: "Residential",
+};
+
+function getCategoryDisplayName(slug: string): string {
+  // Try to get from our mapping first
+  const mappingKey = Object.keys(CATEGORY_NAMES).find(
+    key => key.toLowerCase() === slug.toLowerCase()
+  );
+  if (mappingKey) {
+    return CATEGORY_NAMES[mappingKey];
+  }
+  // Fallback: capitalize the slug
+  return slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
 
 export async function generateMetadata({ params }) {
   const { category } = await params;
-  const cat = await prisma.category.findUnique({
-    where: { slug: category },
-  });
-
-  if (!cat) {
+  const slug = category.toLowerCase();
+  const categoryName = getCategoryDisplayName(slug);
+  
+  const exists = await categoryExists(slug);
+  
+  if (!exists) {
     return {
       title: "Category Not Found | Kazi Constructions",
       description: "The requested category could not be found.",
     };
   }
 
-  const projectCount = await prisma.project.count({
-    where: { categoryId: cat.id },
-  });
+  const projects = await getProjectsByCategory(slug);
+  const projectCount = projects.length;
 
   return {
-    title: `${cat.name} Projects | Kazi Constructions - Interior Design Portfolio`,
-    description: `Browse our ${cat.name} interior design projects. View ${projectCount}+ completed projects showcasing our expertise in ${cat.name.toLowerCase()} interior design and construction.`,
-    keywords: `${cat.name.toLowerCase()} interior design, ${cat.name.toLowerCase()} projects gallery, commercial ${cat.name.toLowerCase()} design, professional ${cat.name.toLowerCase()} contractors`,
+    title: `${categoryName} Projects | Kazi Constructions - Interior Design Portfolio`,
+    description: `Browse our ${categoryName} interior design projects. View ${projectCount}+ completed projects showcasing our expertise in ${categoryName.toLowerCase()} interior design and construction.`,
+    keywords: `${categoryName.toLowerCase()} interior design, ${categoryName.toLowerCase()} projects gallery, commercial ${categoryName.toLowerCase()} design, professional ${categoryName.toLowerCase()} contractors`,
   };
 }
 
 export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category: categorySlug } = await params;
+  const slug = categorySlug.toLowerCase();
 
-  const category = await prisma.category.findUnique({
-    where: { slug: categorySlug },
-  });
+  const exists = await categoryExists(slug);
 
-  if (!category) {
+  if (!exists) {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center">
         <div className="text-center px-4">
@@ -46,39 +66,20 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     );
   }
 
-  const projects = await prisma.project.findMany({
-    where: { categoryId: category.id },
-    include: { images: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  const category = {
+    id: slug,
+    name: getCategoryDisplayName(slug),
+    slug: slug,
+  };
 
-  const projectsWithPreview = await Promise.all(
-    projects.map(async (project) => {
-      let previewImage = null;
-      
-      // First try to get image from Cloudinary
-      try {
-        const cloudinaryImages = await getImagesByFolder(`projects/${categorySlug}/${project.slug}`);
-        if (cloudinaryImages.length > 0) {
-          previewImage = cloudinaryImages[0].secure_url;
-        }
-      } catch (error) {
-        console.error(`Error fetching Cloudinary images for ${project.slug}:`, error);
-      }
-      
-      // Fallback to database images if Cloudinary has no images
-      if (!previewImage && project.images.length > 0) {
-        previewImage = project.images[0].url;
-      }
-      
-      return {
-        id: project.id,
-        title: project.title,
-        slug: project.slug,
-        previewImage: previewImage,
-      };
-    })
-  );
+  const projects = await getProjectsByCategory(slug);
+
+  const projectsWithPreview = projects.map(project => ({
+    id: project.id,
+    title: project.title,
+    slug: project.slug,
+    previewImage: project.previewImage || null,
+  }));
 
   return <CategoryClient category={category} projects={projectsWithPreview} />;
 }
