@@ -1,23 +1,28 @@
-# JSX Fixes TODO List
+# TODO: Within-Page Transitions & SEO Improvements
 
-## Component Files
+## Phase 1: Install Dependencies
 
-- [x] 1. Fix components/CategoryCard.tsx - Removed duplicate code, fixed closing tag
-- [x] 2. Fix components/SiteCard.tsx - Removed duplicate code
-- [x] 3. Fix components/Nav.jsx - Changed ternary operator for conditional rendering, fixed flex-shrink-0 class
-- [x] 4. Fix components/Footer.jsx - Already correct
+- [x] Install framer-motion for smooth animations
 
-## Page Files
+## Phase 2: Create Scroll Animation Components
 
-- [x] 5. Fix app/page.js - Fixed unescaped apostrophe
-- [x] 6. Fix app/about/page.jsx - Already correct
-- [x] 7. Fix app/our_projects/page.tsx - Already correct
-- [x] 8. Fix app/our_projects/[category]/page.tsx - Already correct
-- [x] 9. Fix app/our_projects/[category]/[site]/page.tsx - Already correct
-- [x] 10. Fix app/services/page.jsx - Fixed unescaped apostrophe
+- [x] Create components/ScrollReveal.jsx - Reveal elements on scroll
 
-## Results
+## Phase 3: Add Scroll Animctions to Pages
 
-- All TypeScript errors resolved
-- All ESLint errors resolved
-- Build should now be clean
+- [x] Update app/page.js - Add scroll reveal + SEO metadata
+- [x] Update app/about/page.jsx - Add scroll reveal + SEO metadata
+- [x] Update app/services/page.jsx - Add scroll reveal + SEO metadata
+- [x] Update app/our_projects/page.tsx - Add scroll reveal + SEO metadata
+- [x] Update app/our_projects/[category]/page.tsx - Add scroll reveal + SEO metadata
+- [x] Update app/our_projects/[category]/[site]/page.tsx - Add scroll reveal + SEO metadata
+
+## Phase 4: Update Root Layout (SEO)
+
+- [x] Update app/layout.js with comprehensive metadata
+- [x] Add Open Graph, Twitter Card, canonical URLs
+
+## Phase 5: Testing & Verification
+
+- [ ] Test scroll animations in browser
+- [ ] Verify SEO metadata in browser devtools
