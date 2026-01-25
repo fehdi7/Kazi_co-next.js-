@@ -83,8 +83,15 @@ export interface FullProjectData {
 
 /**
  * Check if Prisma database is available
+ * Skip check in production (Vercel) to avoid connection timeouts
  */
 async function isDatabaseAvailable(): Promise<boolean> {
+  // In production/build time, skip database check to avoid timeouts
+  // The database is not available on Vercel anyway
+  if (process.env.NODE_ENV === 'production') {
+    return false;
+  }
+  
   try {
     await prisma.$queryRaw`SELECT 1`;
     return true;
