@@ -239,9 +239,34 @@ export async function getProjectsByCategory(categorySlug: string): Promise<Proje
     }
   }
 
-  // Use static data as fallback
+  // Use static data as fallback - ALWAYS fetch Cloudinary images for static projects
   console.log(`Using static project data for ${categorySlug} (database unavailable)`);
-  return getStaticProjects(categorySlug);
+  const staticProjects = STATIC_PROJECTS[categorySlug] || [];
+  
+  const staticWithPreviews = await Promise.all(
+    staticProjects.map(async (project) => {
+      let previewImage: string | undefined;
+      
+      // Try Cloudinary
+      try {
+        const cloudinaryImages = await getImagesByFolder(`projects/${categorySlug}/${project.title}`);
+        if (cloudinaryImages.length > 0) {
+          previewImage = cloudinaryImages[0].secure_url;
+        }
+      } catch (error) {
+        // No preview available
+      }
+
+      return {
+        id: String(project.id),
+        title: project.title,
+        slug: project.slug,
+        previewImage,
+      };
+    })
+  );
+
+  return staticWithPreviews;
 }
 
 /**
@@ -262,11 +287,21 @@ function getStaticProjects(categorySlug: string): ProjectData[] {
  * Get all images for a specific project
  */
 export async function getProjectImages(categorySlug: string, projectSlug: string) {
-  const dbAvailable = await isDatabaseAvailable();
-
-  // Try Cloudinary first
+  // Try Cloudinary first - need to find the correct folder name
+  // First try with slug, then try with static project title (with spaces)
   try {
-    const cloudinaryImages = await getImagesByFolder(`projects/${categorySlug}/${projectSlug}`);
+    // Try with slug first (some projects might use slug format)
+    let cloudinaryImages = await getImagesByFolder(`projects/${categorySlug}/${projectSlug}`);
+    
+    // If not found, try with title case from static data
+    if (cloudinaryImages.length === 0) {
+      const staticProjects = STATIC_PROJECTS[categorySlug] || [];
+      const staticProject = staticProjects.find(p => p.slug === projectSlug);
+      if (staticProject) {
+        cloudinaryImages = await getImagesByFolder(`projects/${categorySlug}/${staticProject.title}`);
+      }
+    }
+    
     if (cloudinaryImages.length > 0) {
       return cloudinaryImages.map((img: { secure_url: string; public_id: string }) => ({
         url: img.secure_url,
@@ -278,6 +313,7 @@ export async function getProjectImages(categorySlug: string, projectSlug: string
   }
 
   // Fall back to database
+  const dbAvailable = await isDatabaseAvailable();
   if (dbAvailable) {
     try {
       const category = await prisma.category.findUnique({
