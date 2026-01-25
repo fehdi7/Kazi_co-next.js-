@@ -331,10 +331,12 @@ export async function getProjectDetails(
 
 /**
  * Helper function to get images by folder from Cloudinary
+ * Uses public_id: with wildcard because Cloudinary doesn't always set the folder property
+ * when images are uploaded with the full path as public_id
  */
 async function getImagesByFolder(folder: string) {
   const res = await cloudinary.search
-    .expression(`folder:${folder}`)
+    .expression(`public_id:${folder}/*`)
     .sort_by("created_at", "desc")
     .max_results(100)
     .execute();
